@@ -1,127 +1,599 @@
-<h1>Hello jouda</h1>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Group Classes</title>
+  <title>Group Classes Booking</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 16px; }
-    h1 { font-size: 24px; margin-bottom: 12px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 { 
+      color: white;
+      font-size: 32px; 
+      margin-bottom: 24px; 
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .class-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .class-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .class-header {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .class-info { 
+      flex: 1; 
+      margin-right: 16px;
+    }
+
+    .class-name { 
+      font-size: 22px; 
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .class-details { 
+      font-size: 15px; 
+      color: #666; 
+      margin-bottom: 6px;
+      display: flex;
       align-items: center;
     }
-    .class-info { flex: 1; }
-    .class-name { font-size: 18px; font-weight: bold; }
-    .class-details { font-size: 14px; color: #666; margin-top: 4px; }
-    .book-button {
-      background-color: #000;
-      color: #fff;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+
+    .class-details::before {
+      content: '•';
+      color: #667eea;
+      margin-right: 8px;
       font-weight: bold;
+    }
+
+    .class-details:first-of-type::before {
+      content: '📍';
+    }
+
+    .class-details:nth-of-type(2)::before {
+      content: '📅';
+    }
+
+    .class-details:nth-of-type(3)::before {
+      content: '⏰';
+    }
+
+    .spots-info {
+      display: flex;
+      align-items: center;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .spots-available {
+      color: #28a745;
+    }
+
+    .spots-limited {
+      color: #ffc107;
+    }
+
+    .spots-full {
+      color: #dc3545;
+    }
+
+    .book-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      min-width: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .book-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .book-button:active {
+      transform: translateY(0);
+    }
+
+    .book-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .book-button.booking {
+      background: #ffc107;
+    }
+
+    .book-button.booked {
+      background: #28a745;
+    }
+
+    .error-message {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .no-classes {
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      margin-top: 40px;
+    }
+
+    .refresh-button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 20px auto;
+      display: block;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-button:hover {
+      background: white;
+      color: #667eea;
+    }
+
+    @media (max-width: 600px) {
+      .class-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .class-info {
+        margin-right: 0;
+        margin-bottom: 16px;
+      }
+
+      .book-button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h1>Group Classes</h1>
-  <div id="classes-container">Loading...</div>
+  <div class="container">
+    <h1>Group Classes Booking</h1>
+    <div id="message-container"></div>
+    <div id="classes-container">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <button class="refresh-button" onclick="loadClasses()">Refresh Classes</button>
+  </div>
 
   <script>
+    // API Configuration
     const SESSIONS_API = "https://x8ki-letl-twmt.n7.xano.io/api:EGvSw3pz/course_sessions";
+    const RESERVATIONS_API = "https://x8ki-letl-twmt.n7.xano.io/api:EGvSw3pz/reservations";
+    
+    // BravoStudio integration - these will be dynamically replaced
+    let BRAVO_USER_ID = null;
+    let BRAVO_AUTH_TOKEN = null;
+    
+    // Initialize BravoStudio variables
+    function initializeBravoVariables() {
+      // Try to get variables from BravoStudio context
+      if (typeof window.bravoVariables !== 'undefined') {
+        BRAVO_USER_ID = window.bravoVariables.user_id;
+        BRAVO_AUTH_TOKEN = window.bravoVariables.auth_token;
+      }
+      
+      // Fallback: Try to get from localStorage (BravoStudio often stores here)
+      if (!BRAVO_USER_ID) {
+        BRAVO_USER_ID = localStorage.getItem('bravo_user_id') || localStorage.getItem('user_id');
+      }
+      if (!BRAVO_AUTH_TOKEN) {
+        BRAVO_AUTH_TOKEN = localStorage.getItem('bravo_auth_token') || localStorage.getItem('auth_token');
+      }
+      
+      // Debug logging
+      console.log('BravoStudio User ID:', BRAVO_USER_ID);
+      console.log('BravoStudio Auth Token:', BRAVO_AUTH_TOKEN ? 'Present' : 'Missing');
+    }
+    
+    let bookingInProgress = new Set();
+
+    // Show message to user
+    function showMessage(message, type = 'info') {
+      const container = document.getElementById('message-container');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+      messageDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(messageDiv);
+      
+      // Auto-hide success messages after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          messageDiv.remove();
+        }, 5000);
+      }
+    }
+
+    // Format date and time
+    function formatDateTime(datetime) {
+      const date = new Date(datetime);
+      const dateStr = date.toLocaleDateString("en-US", {
+        weekday: "long", 
+        month: "long", 
+        day: "numeric"
+      });
+      const timeStr = date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      });
+      return { dateStr, timeStr };
+    }
+
+    // Get spots status
+    function getSpotsStatus(availableSpots) {
+      if (availableSpots === 0) {
+        return { class: 'spots-full', text: 'Class Full' };
+      } else if (availableSpots <= 3) {
+        return { class: 'spots-limited', text: `Only ${availableSpots} spots left!` };
+      } else {
+        return { class: 'spots-available', text: `${availableSpots} spots available` };
+      }
+    }
+
+    // Create headers for API requests
+    function createApiHeaders(includeAuth = false) {
+      const headers = {
+        "Content-Type": "application/json"
+      };
+      
+      if (includeAuth && BRAVO_AUTH_TOKEN) {
+        // Try different auth header formats that Xano might expect
+        headers["Authorization"] = `Bearer ${BRAVO_AUTH_TOKEN}`;
+        // Alternative format if Bearer doesn't work
+        headers["X-Auth-Token"] = BRAVO_AUTH_TOKEN;
+        // Another common format
+        headers["Authentication"] = BRAVO_AUTH_TOKEN;
+      }
+      
+      return headers;
+    }
 
     // Fetch and render classes
     async function loadClasses() {
       const container = document.getElementById("classes-container");
-      container.innerHTML = "Loading...";
+      container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+      
+      // Clear any previous messages
+      document.getElementById('message-container').innerHTML = '';
 
       try {
-        const res = await fetch(SESSIONS_API);
+        const headers = createApiHeaders(true); // Include auth for private endpoint
+        
+        const res = await fetch(SESSIONS_API, {
+          method: 'GET',
+          headers: headers
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
         const sessions = await res.json();
 
-        if (!sessions.length) {
-          container.innerHTML = "No classes available.";
+        if (!sessions || !sessions.length) {
+          container.innerHTML = '<div class="no-classes">No classes available at the moment.</div>';
           return;
         }
 
         container.innerHTML = "";
 
+        // Sort sessions by date
+        sessions.sort((a, b) => new Date(a.session_datetime) - new Date(b.session_datetime));
+
         sessions.forEach(session => {
           const course = session._courses;
+          if (!course) return; // Skip if course data is missing
 
-          const dateFormatted = new Date(session.session_datetime).toLocaleDateString("en-US", {
-            weekday: "long", month: "long", day: "numeric"
-          });
+          const { dateStr, timeStr } = formatDateTime(session.session_datetime);
+          const spotsStatus = getSpotsStatus(session.available_spots);
 
           const card = document.createElement("div");
           card.className = "class-card";
           card.innerHTML = `
-            <div class="class-info">
-              <div class="class-name">${course.name}</div>
-              <div class="class-details">${course.location} • ${dateFormatted} • ${course.start_time} • ${course.duration_minutes}</div>
-              <div class="class-details">Available spots: ${session.available_spots}</div>
+            <div class="class-header">
+              <div class="class-info">
+                <div class="class-name">${course.name || 'Unnamed Class'}</div>
+                <div class="class-details">${course.location || 'Location TBD'}</div>
+                <div class="class-details">${dateStr}</div>
+                <div class="class-details">${timeStr} • ${course.duration_minutes || 60} minutes</div>
+                <div class="spots-info ${spotsStatus.class}">
+                  ${spotsStatus.text}
+                </div>
+              </div>
+              <button 
+                class="book-button" 
+                data-id="${session.id}"
+                ${session.available_spots === 0 ? 'disabled' : ''}
+              >
+                ${session.available_spots === 0 ? 'FULL' : 'BOOK'}
+              </button>
             </div>
-            <button class="book-button" data-id="${session.id}">BOOK</button>
           `;
 
           container.appendChild(card);
         });
 
         // Attach booking actions
-        document.querySelectorAll(".book-button").forEach(btn => {
+        document.querySelectorAll(".book-button:not([disabled])").forEach(btn => {
           btn.addEventListener("click", (e) => {
             const sessionId = e.target.dataset.id;
-            bookSession(sessionId);
+            bookSession(sessionId, e.target);
           });
         });
 
       } catch (error) {
         console.error("Error loading sessions:", error);
-        container.innerHTML = "Error loading classes.";
+        let errorMessage = "Failed to load classes. ";
+        
+        if (error.message.includes('401')) {
+          errorMessage += "Please make sure you're logged in.";
+        } else if (error.message.includes('403')) {
+          errorMessage += "You don't have permission to view classes.";
+        } else {
+          errorMessage += "Please check your connection and try again.";
+        }
+        
+        container.innerHTML = '<div class="no-classes">Error loading classes. Please try again.</div>';
+        showMessage(errorMessage, 'error');
       }
     }
 
-   async function bookSession(sessionId) {
-  const API_URL = `https://x8ki-letl-twmt.n7.xano.io/api:EGvSw3pz/reservations/${sessionId}`;
-  
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // IMPORTANT: Replace with your Bravo Studio variable or token
-        // In Bravo Studio, store your token securely in the Data Library
-       
-      },
-      // If your reservation endpoint requires a user_id, add it here
- 
-    });
+    // Book a session
+    async function bookSession(sessionId, buttonElement) {
+      // Check if user is authenticated
+      if (!BRAVO_USER_ID) {
+        showMessage("Please log in to book a class.", 'error');
+        return;
+      }
+      
+      // Prevent multiple simultaneous bookings
+      if (bookingInProgress.has(sessionId)) {
+        return;
+      }
 
-    const data = await response.json();
+      bookingInProgress.add(sessionId);
+      
+      // Update button state
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = 'BOOKING...';
+      buttonElement.className = 'book-button booking';
+      buttonElement.disabled = true;
+      
+      try {
+        // Prepare request body - Xano typically expects specific field names
+        const requestBody = {
+          course_session_id: parseInt(sessionId),
+          user_id: parseInt(BRAVO_USER_ID)
+        };
 
-    if (response.ok) {
-      alert("Session booked successfully!");
-    } else {
-      alert(`Booking failed: ${data.message || "Unknown error"}`);
+        const headers = createApiHeaders(true);
+        
+        console.log('Booking request:', {
+          url: RESERVATIONS_API,
+          body: requestBody,
+          headers: headers
+        });
+
+        const response = await fetch(RESERVATIONS_API, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(requestBody)
+        });
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse response:', parseError);
+          data = { message: 'Invalid response from server' };
+        }
+
+        console.log('Booking response:', { status: response.status, data });
+
+        if (response.ok) {
+          // Success
+          buttonElement.textContent = '✓ BOOKED';
+          buttonElement.className = 'book-button booked';
+          showMessage("Class booked successfully! You'll receive a confirmation shortly.", 'success');
+          
+          // Notify BravoStudio of successful booking
+          if (window.bravoStudioCallback) {
+            window.bravoStudioCallback('booking_success', { sessionId, data });
+          }
+          
+          // Refresh the classes list after a short delay
+          setTimeout(() => {
+            loadClasses();
+          }, 2000);
+          
+        } else {
+          // Handle specific error cases
+          let errorMessage = "Booking failed. Please try again.";
+          
+          if (data && data.message) {
+            errorMessage = data.message;
+          } else if (response.status === 400) {
+            errorMessage = "Invalid booking request. Please try again.";
+          } else if (response.status === 401) {
+            errorMessage = "Authentication required. Please log in again.";
+          } else if (response.status === 403) {
+            errorMessage = "You don't have permission to book this class.";
+          } else if (response.status === 409) {
+            errorMessage = "This class is already full or you're already registered.";
+          } else if (response.status === 422) {
+            errorMessage = "Booking validation failed. Please check your details.";
+          }
+          
+          showMessage(errorMessage, 'error');
+          
+          // Notify BravoStudio of booking error
+          if (window.bravoStudioCallback) {
+            window.bravoStudioCallback('booking_error', { sessionId, error: errorMessage, data });
+          }
+          
+          // Reset button
+          buttonElement.textContent = originalText;
+          buttonElement.className = 'book-button';
+          buttonElement.disabled = false;
+        }
+
+      } catch (error) {
+        console.error("Booking error:", error);
+        showMessage("Network error occurred. Please check your connection and try again.", 'error');
+        
+        // Notify BravoStudio of network error
+        if (window.bravoStudioCallback) {
+          window.bravoStudioCallback('booking_error', { sessionId, error: error.message });
+        }
+        
+        // Reset button
+        buttonElement.textContent = originalText;
+        buttonElement.className = 'book-button';
+        buttonElement.disabled = false;
+      } finally {
+        bookingInProgress.delete(sessionId);
+      }
     }
 
-  } catch (error) {
-    console.error("Booking error:", error);
-    alert("An error occurred while booking.");
-  }
-}
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeBravoVariables();
+      loadClasses();
+    });
 
-    loadClasses();
+    // Auto-refresh every 5 minutes to keep data current
+    setInterval(loadClasses, 5 * 60 * 1000);
+
+    // BravoStudio communication functions
+    window.bravoStudioCallback = function(action, data) {
+      if (action === 'booking_success') {
+        showMessage("Booking confirmed!", 'success');
+        loadClasses();
+      } else if (action === 'booking_error') {
+        showMessage(data.message || "Booking failed", 'error');
+      } else if (action === 'user_authenticated') {
+        BRAVO_USER_ID = data.user_id;
+        BRAVO_AUTH_TOKEN = data.auth_token;
+        loadClasses();
+      }
+    };
+
+    // Expose functions for BravoStudio
+    window.refreshClasses = loadClasses;
+    window.bookClass = bookSession;
+    window.setBravoVariables = function(userId, authToken) {
+      BRAVO_USER_ID = userId;
+      BRAVO_AUTH_TOKEN = authToken;
+      console.log('BravoStudio variables updated:', { userId, authToken: authToken ? 'Present' : 'Missing' });
+    };
   </script>
 </body>
 </html>
