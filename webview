@@ -1,0 +1,127 @@
+<h1>Hello jouda</h1>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group Classes</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; }
+    h1 { font-size: 24px; margin-bottom: 12px; }
+    .class-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .class-info { flex: 1; }
+    .class-name { font-size: 18px; font-weight: bold; }
+    .class-details { font-size: 14px; color: #666; margin-top: 4px; }
+    .book-button {
+      background-color: #000;
+      color: #fff;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Group Classes</h1>
+  <div id="classes-container">Loading...</div>
+
+  <script>
+    const SESSIONS_API = "https://x8ki-letl-twmt.n7.xano.io/api:EGvSw3pz/course_sessions";
+
+    // Fetch and render classes
+    async function loadClasses() {
+      const container = document.getElementById("classes-container");
+      container.innerHTML = "Loading...";
+
+      try {
+        const res = await fetch(SESSIONS_API);
+        const sessions = await res.json();
+
+        if (!sessions.length) {
+          container.innerHTML = "No classes available.";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        sessions.forEach(session => {
+          const course = session._courses;
+
+          const dateFormatted = new Date(session.session_datetime).toLocaleDateString("en-US", {
+            weekday: "long", month: "long", day: "numeric"
+          });
+
+          const card = document.createElement("div");
+          card.className = "class-card";
+          card.innerHTML = `
+            <div class="class-info">
+              <div class="class-name">${course.name}</div>
+              <div class="class-details">${course.location} • ${dateFormatted} • ${course.start_time} • ${course.duration_minutes}</div>
+              <div class="class-details">Available spots: ${session.available_spots}</div>
+            </div>
+            <button class="book-button" data-id="${session.id}">BOOK</button>
+          `;
+
+          container.appendChild(card);
+        });
+
+        // Attach booking actions
+        document.querySelectorAll(".book-button").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const sessionId = e.target.dataset.id;
+            bookSession(sessionId);
+          });
+        });
+
+      } catch (error) {
+        console.error("Error loading sessions:", error);
+        container.innerHTML = "Error loading classes.";
+      }
+    }
+
+   async function bookSession(sessionId) {
+  const API_URL = `https://x8ki-letl-twmt.n7.xano.io/api:EGvSw3pz/reservations/${sessionId}`;
+  
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // IMPORTANT: Replace with your Bravo Studio variable or token
+        // In Bravo Studio, store your token securely in the Data Library
+       
+      },
+      // If your reservation endpoint requires a user_id, add it here
+ 
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Session booked successfully!");
+    } else {
+      alert(`Booking failed: ${data.message || "Unknown error"}`);
+    }
+
+  } catch (error) {
+    console.error("Booking error:", error);
+    alert("An error occurred while booking.");
+  }
+}
+
+    loadClasses();
+  </script>
+</body>
+</html>
